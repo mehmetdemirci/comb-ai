@@ -23,6 +23,9 @@ When using AI assistants (Claude, Cursor, GitHub Copilot, etc.) on long-running 
 4. **Automates memory updates** — Completion signals trigger targeted document updates
 5. **Archives historical data** — Completed sprints move to archives, keeping active files lean
 
+![vibe-coding-ai-assisted](https://github.com/user-attachments/assets/b141ea11-c770-4bfd-8d0f-a9e975793204)
+
+
 ## How It Works
 
 Instead of loading all documentation every session, COMB:
