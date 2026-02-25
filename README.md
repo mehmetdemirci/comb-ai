@@ -2,6 +2,10 @@
 
 A methodology for **significant token reduction** in AI-assisted software development through intelligent documentation structure and context-aware reading strategies.
 
+<p align="center">
+  <img src="templates/vibe-coding-ai-assisted.jpeg" alt="AI Vibe Coding vs Engineer-Guided AI" width="600" />
+</p>
+
 ---
 
 ## The Problem
@@ -23,10 +27,27 @@ When using AI assistants (Claude, Cursor, GitHub Copilot, etc.) on long-running 
 4. **Automates memory updates** — Completion signals trigger targeted document updates
 5. **Archives historical data** — Completed sprints move to archives, keeping active files lean
 
-![vibe-coding-ai-assisted](https://github.com/user-attachments/assets/b141ea11-c770-4bfd-8d0f-a9e975793204)
-
-
 ## How It Works
+
+```mermaid
+flowchart TD
+    INDEX["INDEX.md — Entry Point"]
+
+    subgraph STATIC ["Static (cached)"]
+        TECH["tech/*.md"]
+        ARCH["arch/patterns-overview.md"]
+    end
+
+    subgraph DYNAMIC ["Dynamic (fresh each task)"]
+        AC["active-context.md"]
+        ST["sprint-tracker.md"]
+    end
+
+    INDEX --> TECH
+    INDEX --> ARCH
+    INDEX --> AC
+    INDEX --> ST
+```
 
 Instead of loading all documentation every session, COMB:
 
@@ -34,6 +55,14 @@ Instead of loading all documentation every session, COMB:
 - **Routes by task type** — Bug fix loads different files than sprint planning
 - **Optimizes reading order** — Static files first to maximize LLM prompt cache hits
 - **Keeps files lean** — Active files stay small, historical data moves to archives
+
+```mermaid
+flowchart LR
+    Task{Task Type} -->|Bug fix| BF["INDEX + active-context<br/>+ tech file"]
+    Task -->|New feature| NF["INDEX + active-context<br/>+ sprint-tracker + tech file"]
+    Task -->|Architecture| AR["INDEX + active-context<br/>+ patterns-overview"]
+    Task -->|Sprint planning| SP["INDEX + active-context<br/>+ sprint-tracker + backlog"]
+```
 
 ## Quick Start
 
@@ -173,26 +202,28 @@ github/
 
 All shared content lives in **plain markdown**. Only the Cursor wrapper uses `.mdc`:
 
-```
-memory-bank-protocol.md        (plain markdown — THE methodology)
-      Reading strategy, Plan/Act workflows, update protocol, Mermaid diagrams.
-      → Read by both tools. Cached for session.
+```mermaid
+flowchart TD
+    subgraph SHARED ["Shared Content (plain .md)"]
+        PROTO["memory-bank-protocol.md<br/>Methodology"]
+        RULES["project-rules.md<br/>Rules + dynamic zone"]
+        MB["memory-bank/<br/>Project knowledge"]
+    end
 
-project-rules.md               (plain markdown — THE rules)
-      Coding standards, constraints, prohibitions, git conventions.
-      === DYNAMIC CONTENT === (re-read each task)
-      Current sprint context, recent patterns.
-      → Read by both tools. Dynamic zone re-read each task.
+    CLAUDE["Claude Code"] -->|"CLAUDE.md"| PROTO
+    CURSOR["Cursor"] -->|".mdc wrapper"| PROTO
+    WIND["Windsurf"] -->|".cursorrules"| PROTO
+    COPILOT["GitHub Copilot"] -->|"copilot-instructions.md"| PROTO
 
-CLAUDE.md                      (plain markdown — pointer, ~40 lines)
-      "Read memory-bank-protocol.md"
-      "Read project-rules.md"
-      + Key project decisions
+    CLAUDE --> RULES
+    CURSOR --> RULES
+    WIND --> RULES
+    COPILOT --> RULES
 
-.cursor/rules/memory-bank.mdc  (Cursor .mdc — thin wrapper, ~15 lines)
-      alwaysApply: true
-      "Read memory-bank-protocol.md"
-      "Read project-rules.md"
+    CLAUDE --> MB
+    CURSOR --> MB
+    WIND --> MB
+    COPILOT --> MB
 ```
 
 **Design principle**: `.mdc` is Cursor-specific — never referenced by Claude. All shared content is plain `.md`.
